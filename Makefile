@@ -9,7 +9,7 @@ ARCH=$(shell uname -m)
 DOCKERS=docker_device_virtual_go
 .PHONY: $(DOCKERS)
 
-VERSION=$(shell cat ./VERSION 2>/dev/null || echo 0.0.0)
+VERSION=3.0.0
 GIT_SHA=$(shell git rev-parse HEAD)
 
 GOFLAGS=-ldflags "-X github.com/edgexfoundry/device-virtual-go.Version=$(VERSION)" -trimpath -mod=readonly
@@ -50,6 +50,7 @@ docker_device_virtual_go:
 		--label "git_sha=$(GIT_SHA)" \
 		-t edgexfoundry/device-virtual:$(GIT_SHA) \
 		-t edgexfoundry/device-virtual:$(VERSION)-dev \
+		-t cr.loongnix.cn/edgexfoundry/device-virtual:$(VERSION) \
 		.
 
 docker-nats:

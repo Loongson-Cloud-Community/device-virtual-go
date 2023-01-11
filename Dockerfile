@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-ARG BASE=golang:1.18-alpine3.16
+ARG BASE=cr.loongnix.cn/library/golang:1.19-alpine
 FROM ${BASE} AS builder
 
 ARG ALPINE_PKG_BASE="make git openssh-client"
@@ -27,17 +27,20 @@ WORKDIR /device-virtual-go
 # Install our build time packages.
 RUN apk add --update --no-cache ${ALPINE_PKG_BASE} ${ALPINE_PKG_EXTRA}
 
+ENV GO111MODULE=auto GOPROXY=https://goproxy.cn,direct
+
 COPY go.mod vendor* ./
 RUN [ ! -d "vendor" ] && go mod download all || echo "skipping..."
 
 COPY . .
+RUN go mod tidy
 # To run tests in the build container:
 #   docker build --build-arg 'MAKE=build test' .
 # This is handy of you do your Docker business on a Mac
 ARG MAKE="make -e ADD_BUILD_TAGS=$ADD_BUILD_TAGS build"
 RUN $MAKE
 
-FROM alpine:3.16
+FROM cr.loongnix.cn/library/alpine:3.11
 
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
   copyright='Copyright (c) 2019-2021: IOTech'
